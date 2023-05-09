@@ -1,0 +1,349 @@
+<template>
+  <div class="chart-guage">
+    <div :id="id" style="height: 90%"></div>
+    <div class="title">
+      <span>{{ title }}</span>
+      <span>{{ detail }}{{ detail ? '°C' : '' }}</span>
+    </div>
+    <div class="title-sub">
+      <span>{{ subTitle }}</span>
+    </div>
+    <!-- <span class="value-18">18</span>
+    <span class="value-28">28</span> -->
+  </div>
+</template>
+<script lang="ts" setup>
+import { ref, watch } from 'vue';
+import { getUuid } from '@/utils';
+import useChart from '@/hooks/useChart';
+
+const props = defineProps({
+  title: {
+    type: String,
+    default: '',
+  },
+  subTitle: {
+    type: String,
+    default: '',
+  },
+  target: {
+    type: [Number, String],
+    default: null,
+  },
+  detail: {
+    type: [Number, String],
+    default: null,
+  },
+  value: {
+    type: Number,
+    default: 0,
+  },
+  lowAlarmNum: {
+    type: Number,
+    default: 0,
+  },
+  lowWarnNum: {
+    type: Number,
+    default: 0,
+  },
+  highWarnNum: {
+    type: Number,
+    default: 0,
+  },
+  highAlarmNum: {
+    type: Number,
+    default: 0,
+  },
+});
+
+const id = ref(getUuid());
+const option = {
+  // backgroundColor: '#ffffff',
+  series: [
+    {
+      type: 'pie',
+      name: '背景饼图',// 中心饼，不用
+      radius: ['0%', '0%'],
+      z: 1, // 放在第一层
+      // emphasis: {
+      //   scale: false,
+      // },
+      // itemStyle: {
+      //   // color: '#ffffff',
+      //   color:'rgba(191,191,191,0.9)',
+      //   opacity: 0
+      // },
+      label: {
+        show: false
+      },
+      // data: [100]
+    },
+    {
+      type: 'gauge',
+      radius: '78%',
+      axisLabel: {// 刻度值
+        color: 'inherit',
+        show: false,
+
+      },
+      splitLine: { // 刻度线
+        show: false,
+      },
+      axisTick: {// 外环刻度
+      show:false,
+      }
+      
+
+      // type: 'pie',
+      // name: '阴影环',// 中心圆环，显示
+      // radius: ['78%', '80%'],
+      // z: 10000,  // 仅在背景饼图上方，背景遮挡一部分阴影，实现外圈阴影
+      // // startAngle: 200,
+      // emphasis: {
+      //   scale: false,
+      // },
+      // itemStyle: {
+      //   color: '#f3f3f3',
+      //   shadowColor: 'rgba(191,191,191,0)',
+      //   // shadowBlur: 10,
+      //   opacity: 0.1
+
+      // },
+      // label: {
+      //   show: false
+      // },
+      // data: [1]
+    },
+    {
+      type: 'pie',
+      name: '内层圆环',// 不显示
+      radius: ['46%', '52%'],
+      z: 2,
+      startAngle: 200,
+      emphasis: {
+        scale: false,
+      },
+      itemStyle: {
+        color: {
+          type: 'linear',
+          x: 0,
+          y: 0,
+          x2: 0,
+          y2: 1,
+          colorStops: [
+            {
+              offset: 0,
+              color: '#96C7F2' // 0% 处的颜色
+            },
+            {
+              offset: 1,
+              color: '#647DE2' // 100% 处的颜色
+            }
+          ]
+        },
+        opacity: 1
+      },
+      label: {
+        show: false
+      },
+      data: [100]
+    },
+    {
+      type: 'pie',
+      name: '中层圆环',// 不显示
+      radius: ['60.5%', '67%'],
+      z: 2,
+      startAngle: 200,
+      emphasis: {
+        scale: false,
+      },
+      itemStyle: {
+        color: '#eaeaea',
+        opacity: 0
+      },
+      label: {
+        show: false
+      },
+      data: [{ value: 0 }]
+    },
+    {
+      type: 'gauge',
+      radius: '76%',
+      min: 10,
+      max: 35,
+      splitNumber:10,
+      z: 3,
+      title: {
+        show: true
+      },
+      axisLine: {// 仪表盘色块
+        lineStyle: {
+          width: 26,
+          shadowColor: '#F30000',
+          color: [
+            [5 / 25, '#F30000'],
+            [8 / 25, '#FF9F00'],
+            [18 / 25, '#35C28F'],
+            [20 / 25, '#FF9F00'],
+            [1, '#F30000']
+          ]
+        }
+      },
+      pointer: {// 指针
+        width: 4,
+        length: '50%',
+        offsetCenter: [0, '-55%'],
+        itemStyle: {
+          color: '#fff'
+        }
+      },
+      axisTick: {// 外环刻度
+        distance: -32,
+        length: 2,
+        splitNumber: 5,
+        lineStyle: {
+          color: '#ffffff',
+          width: 1
+        }
+      },
+      splitLine: { // 刻度线
+        distance: -30,
+        length: 1,
+        lineStyle: {
+          color: '#fff',
+          // color: '#ff0000',
+          width: 1
+        }
+      },
+      axisLabel: {// 刻度值
+        color: 'inherit',
+        distance: -10,
+        fontSize: 18,
+        formatter: function (v: number) {
+          switch (v + '') {
+            case '10':
+              return '10';
+            case '15':
+              return '15';
+            case '18':
+              return '18';
+            case '20':
+              return '20';
+            case '25':
+              return '25';
+            case '28':
+              return '28';
+            case '30':
+              return '30';
+            case '35':
+              return '35';
+          }
+        }
+      },
+      detail: {
+        valueAnimation: true,
+        formatter: '{value} °C',
+        color: '#ffffff',
+        fontSize: 24,
+        offsetCenter: [0, 0]
+      },
+      data: [] as { value: number }[]
+    },
+  ]
+};
+const { chart } = useChart(id.value, option, () => setSize);
+
+watch(() => props.value, () => {
+  option.series[4].data = [{ value: props.value }];
+  setColor();
+  chart.instance.setOption(option);
+});
+watch(() => [props.lowAlarmNum, props.lowWarnNum, props.highAlarmNum, props.highWarnNum], () => {
+  setColor();
+  chart.instance.setOption(option);
+});
+/**
+ * 根据标准值设置chart的颜色分布
+ */
+const setColor = () => {
+  if (props.lowAlarmNum < 10 || props.lowWarnNum < 10 || props.highWarnNum < 10 || props.highAlarmNum < 10) {
+    option.series[4].axisLine!.lineStyle.color = [
+      [1, '#35C28F']
+    ];
+  } else {
+    option.series[4].axisLine!.lineStyle.color = [
+      [(props.lowAlarmNum - 10) / 25, '#F30000'],
+      [(props.lowWarnNum - 10) / 25, '#FF9F00'],
+      [(props.highWarnNum - 10) / 25, '#35C28F'],
+      [(props.highAlarmNum - 10) / 25, '#FF9F00'],
+      [1, '#F30000']
+    ];
+  }
+};
+/**
+ * 重置chart中的固定单位
+ */
+const setSize = () => {
+  const clientWidth = document.documentElement.clientWidth;
+  option.series[4].axisLine!.lineStyle.width = 26 / 1920 * clientWidth;
+  option.series[4].axisTick!.distance = -32 / 1920 * clientWidth;
+  option.series[4].splitLine!.distance = -40 / 1920 * clientWidth;
+  option.series[4].splitLine!.length = 40 / 1920 * clientWidth;
+  option.series[4].axisLabel!.fontSize = 18 / 1920 * clientWidth;
+  option.series[4].axisLabel!.distance = -30 / 1920 * clientWidth;
+  option.series[4].detail!.fontSize = 24 / 1920 * clientWidth;
+}
+</script>
+<style lang="scss" scoped>
+.chart-guage {
+  position: relative;
+  height: 100%;
+
+  .title {
+    position: absolute;
+    left: 0;
+    bottom: 33px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    line-height: 22px;
+    color: #0021CB;
+    font-size: 18px;
+  }
+
+  .title-sub {
+    position: absolute;
+    left: 0;
+    top: 170px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    line-height: 22px;
+    color: #35C28F;
+    font-size: 17px;
+    font-weight: bold;
+  }
+
+  .value-18 {
+    position: absolute;
+    top: 64px;
+    left: 40px;
+    font-size: 21px;
+    color: #FF9F00;
+    cursor: context-menu;
+  }
+
+  .value-28 {
+    position: absolute;
+    right: 28px;
+    top: 82px;
+    font-size: 21px;
+    color: #FF9F00;
+    cursor: context-menu;
+  }
+}
+</style>
