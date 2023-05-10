@@ -1,0 +1,189 @@
+<template>
+  <div class="flex-row justify-between">
+    <div :class="[
+      'flex-col',
+      envControl.livestockOnHand.incubator === 1 ? 'group_3' : 'group_9_1'
+    ]">
+      <div class="group_3-inner">
+        <div class="alarm-light">
+          <img src="../img/alarm_light_red.gif" alt="报警灯" />
+        </div>
+        <div class="text-wrapper_69 flex-row">
+          <span class="text_40">当前</span>
+        </div>
+        <div class="box_19 flex-col">
+          <ChartTempGuage class="chart2" title="" sub-title=""
+          :value="envControl.currentTemperature.now"
+          :target="25"
+          :lowAlarmNum="envControl.lowHighTemp.lowAlarmNum"
+          :lowWarnNum="envControl.lowHighTemp.lowWarnNum"
+          :highWarnNum="envControl.lowHighTemp.highWarnNum"
+          :highAlarmNum="envControl.lowHighTemp.highAlarmNum"
+          />
+        </div>
+        <div class="text-wrapper_70 flex-row" v-show="envControl.livestockOnHand.incubator">
+          <span class="text_224_1">保温箱温度</span>
+        </div>
+        <div class="text-wrapper_71 flex-row" v-show="envControl.livestockOnHand.incubator">
+          <span :class=" envControl.livestockOnHand.incubatorTemp === '保温灯关闭' ?'text_225_2':'text_225_1'">
+          {{ envControl.livestockOnHand.incubatorTemp ?
+            envControl.livestockOnHand.incubatorTemp : '-' }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="text-wrapper_15_1 flex-col justify-between"  v-show="!envControl.livestockOnHand.incubator">
+      <div class="text-group_18 flex-col justify-between">
+        <span class="text_228">室外温度</span>
+        <span class="text_229">{{ envControl.currentTemperature.outSideData ? envControl.currentTemperature.outSideData :
+          '-' }}°C</span>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script lang="ts" setup>
+import ChartTempGuage from './chart/ChartTempGuage.vue';
+// import ChartLine from './ChartLine.vue';
+import Humidity from './Humidity.vue';
+import useStore from '../store';
+const { envControl } = useStore();
+</script>
+<style lang="scss" scoped>
+.chart-temperature {
+  position: relative;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  height: 313px;
+  background: #fdfdfd;
+  box-shadow: 0px 8px 40px 0px rgba(0, 0, 0, 0.07);
+  border-radius: 10px;
+  overflow: hidden;
+
+  .icon {
+    background-position: 12px 0 !important;
+  }
+
+  .temperature-outside {
+    position: absolute;
+    top: 12px;
+    right: 20px;
+    color: #000;
+    font-size: 22px;
+    font-weight: bold;
+
+    .value {
+      color: #1c2bb2;
+    }
+  }
+
+  .chart1,
+  .chart2,
+  .chart3 {
+    width: 290px;
+    height: 100%;
+  }
+
+  .chart1,
+  .chart3 {
+    transform: translateY(6px) scale(0.78);
+  }
+}
+</style>
+<style lang="scss">
+.temperature-popover {
+  top: -30px !important;
+  width: auto !important;
+  border: 0 !important;
+  background: #23395c !important;
+
+  .el-popover__title {
+    color: #fff;
+  }
+
+  .el-popper__arrow::before {
+    background: #23395c !important;
+  }
+}
+
+.group_9_1 {
+  height: 221px;
+  background: url(../img/SketchPng510b9aa0132c423f2e63a401c10fbcb3531be43525877df47bbd416e948d0afc.png)
+    100% no-repeat;
+  background-size: 100% 100%;
+  width: 394px;
+  position: relative;
+}
+.text-wrapper_15_1 {
+  width: 222px;
+  height: 221px;
+  background: url(../img/SketchPng244e147ffdcabb203ce267587f16488e9c7a4d1a7c84ebbff131d4013556760e.png)
+    100% no-repeat;
+  background-size: 100% 100%;
+  padding-top: 50px;
+}
+
+.text_224_1 {
+  width: 200px;
+  height: 25px;
+  overflow-wrap: break-word;
+  color: rgba(255, 255, 255, 1);
+  font-size: 25px;
+  font-family: SourceHanSansCN-Bold;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+  line-height: 38px;
+}
+
+.text_225_1{
+  width: 200px;
+  height: 40px;
+  overflow-wrap: break-word;
+  color: rgba(81, 255, 95, 1);
+  font-size: 40px;
+  letter-spacing: 2.299999952316284px;
+  font-family: SourceHanSansCN-Bold;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+  line-height: 60px;
+}
+.text_225_2{
+  width: 200px;
+  height: 40px;
+  overflow-wrap: break-word;
+  color: rgba(81, 255, 95, 1);
+  font-size: 22px;
+  letter-spacing: 2.299999952316284px;
+  font-family: SourceHanSansCN-Bold;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+  line-height: 60px;
+}
+.text-wrapper_71{
+  width: 99px;
+  height: 40px;
+  margin: 9px 0 67px 400px;
+}
+.group_3 {
+  position: relative;
+  /* 其他样式保持不变 */
+}
+
+.group_3-inner {
+  position: relative;
+  width: 100%;
+}
+
+/* 报警灯样式 */
+.alarm-light {
+  position: absolute;
+  top: -40px; /* 根据需要调整顶部位置 */
+  left: 60%; /* 让报警灯相对于.group_3-inner水平居中 */
+  transform: translateX(-50%) scale(0.5); /* 使报警灯向左偏移一定比例，以达到居中的效果 */
+  z-index: 1000; /* 确保报警灯在其他元素之上 */
+}
+</style>
